@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <script src="https://aframe.io/releases/0.7.1/aframe.min.js"></script>
+    </head>
+        
+    <body>
+        <button onclick="flsound.play(); frsound.play(); rrsound.play(); rlsound.play();" type="button">Play sounds</button>
+        
+        <h2>Set stereo panning</h2>
+        
+        <input class="panning-control-FL" type="range" min="0" max="360" step="1" value="0">
+        <span class="panning-value-FL">0</span><br>
+
+        <a-scene>
+            <a-assets>
+                <video id="qvideo1" autoplay="true" loop="true">
+                    <source type="video/mp4" src="20180509360videoreduce.mp4"/>
+                </video>
+            </a-assets>
+            <a-videosphere src="#qvideo1" rotation="0 -90 0"></a-videosphere>
+        </a-scene>
+        
+        <audio id="FL">
+            <source src="20180509FLreduce.mp3" type="audio/mp3">
+        </audio>
+        <audio id="FR">
+            <source src="20180509FRreduce.mp3" type="audio/mp3">
+        </audio>
+        <audio id="RR">
+            <source src="20180509RRreduce.mp3" type="audio/mp3">
+        </audio>
+        <audio id="RL">
+            <source src="20180509RLreduce.mp3" type="audio/mp3">
+        </audio>
+    </body>
+    
+    <script>
+        var audioCtx = new (window.AudioContext || window.webkitAudioContext) ();
+        var flsound = document.querySelector('#FL');
+        var frsound = document.querySelector('#FR');
+        var rrsound = document.querySelector('#RR');
+        var rlsound = document.querySelector('#RL');
+        var myScript = document.querySelector('script');
+        
+        var panControl1 = document.querySelector('.panning-control-FL');
+        var panValue1 = document.querySelector('.panning-value-FL');
+        
+        var source1 = audioCtx.createMediaElementSource(flsound);
+        var source2 = audioCtx.createMediaElementSource(frsound);
+        var source3 = audioCtx.createMediaElementSource(rrsound);
+        var source4 = audioCtx.createMediaElementSource(rlsound);
+        
+        var panNode1 = audioCtx.createStereoPanner();
+        var panNode2 = audioCtx.createStereoPanner();
+        var panNode3 = audioCtx.createStereoPanner();
+        var panNode4 = audioCtx.createStereoPanner();
+        var gainNode1 = audioCtx.createGain();
+        var gainNode2 = audioCtx.createGain();
+        var gainNode3 = audioCtx.createGain();
+        var gainNode4 = audioCtx.createGain();
+        
+        panControl1.oninput = function() {
+            if ((panControl1.value)%360 >=0 && (panControl1.value)%360 < 90) {
+                panNode1.pan.value = -1;
+                panNode2.pan.value = -((panControl1.value)%90/45)+1;
+                panNode3.pan.value = 1;
+                panNode4.pan.value = ((panControl1.value)%90/45)-1;
+                gainNode1.gain.value = -((panControl1.value)%90/90)+1;
+                gainNode2.gain.value = 1;
+                gainNode3.gain.value = ((panControl1.value)%90/90);
+                gainNode4.gain.value = 0;
+            }
+            if ((panControl1.value)%360 >=90 && (panControl1.value)%360 < 180) {
+                panNode1.pan.value = ((panControl1.value)%90/45)-1;
+                panNode2.pan.value = -1;
+                panNode3.pan.value = -((panControl1.value)%90/45)+1;
+                panNode4.pan.value = 1;
+                gainNode1.gain.value = 0;
+                gainNode2.gain.value = -((panControl1.value)%90/90)+1;
+                gainNode3.gain.value = 1;
+                gainNode4.gain.value = ((panControl1.value)%90/90);
+            }
+            if ((panControl1.value)%360 >=180 && (panControl1.value)%360 < 270) {
+                panNode1.pan.value = 1;
+                panNode2.pan.value = ((panControl1.value)%90/45)-1;
+                panNode3.pan.value = -1;
+                panNode4.pan.value = -((panControl1.value)%90/45)+1;
+                gainNode1.gain.value = ((panControl1.value)%90/90);
+                gainNode2.gain.value = 0;
+                gainNode3.gain.value = -((panControl1.value)%90/90)+1;
+                gainNode4.gain.value = 1;
+            }
+            if ((panControl1.value)%360 >=270 && (panControl1.value)%360 < 360) {
+                panNode1.pan.value = -((panControl1.value)%90/45)+1;
+                panNode2.pan.value = 1;
+                panNode3.pan.value = ((panControl1.value)%90/45)-1;
+                panNode4.pan.value = -1;
+                gainNode1.gain.value = 1;
+                gainNode2.gain.value = ((panControl1.value)%90/90);
+                gainNode3.gain.value = 0;
+                gainNode4.gain.value = -((panControl1.value)%90/90)+1;
+            }
+            panValue1.innerHTML = panControl1.value;
+        }
+        
+        source1.connect(gainNode1);
+        gainNode1.connect(panNode1);
+        panNode1.connect(audioCtx.destination);
+        source2.connect(gainNode2);
+        gainNode2.connect(panNode2);
+        panNode2.connect(audioCtx.destination);
+        source3.connect(gainNode3);
+        gainNode3.connect(panNode3);
+        panNode3.connect(audioCtx.destination);
+        source4.connect(gainNode4);
+        gainNode4.connect(panNode4);
+        panNode4.connect(audioCtx.destination);
+    </script>
+
+</html>
